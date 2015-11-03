@@ -1,4 +1,4 @@
-var webService = "http://72.29.87.162/~artritis/wordpress/zopp.php";
+var webService = "http://98.142.105.122/~artritis/wordpress/zopp.php";
 
 var router = new $.mobile.Router({
   "#home": {handler: "home", events: "s" },
@@ -8,34 +8,40 @@ var router = new $.mobile.Router({
 },{
   home: function(type,match,ui){
       
-      $('.home').hide();
-      $.mobile.loading( 'show', {
-         text: 'Sincronizando...',
-         textVisible: true,
-         theme: 'z',
-         html: ""
-     });
-      $.ajax({
-          type:"GET",
-          url:webService,
-          data:{
-              accion:"sincronizacion"
-          },
-          success:function(data){
-              var datos = JSON.parse(data);
-              
-              localStorage.setItem('all_data_eng',JSON.stringify(datos[0]));
-              localStorage.setItem('all_data_esp',JSON.stringify(datos[1]));
-              $.mobile.loading( 'hide', {
-                 text: '',
-                 textVisible: true,
-                 theme: 'z',
-                 html: ""
-             });
-             $('.home').show();
-          }
-      });
+    $('.home').hide();
+
+    $.mobile.loading( 'show', {
+       text: 'Sincronizando...',
+       textVisible: true,
+       theme: 'z',
+       html: ""
+    });
+
+    $.ajax({
+        type:"GET",
+        url: webService,
+        data:{
+            accion:"sincronizacion"
+        },
+        success:function(data){
+            var datos = JSON.parse(data);
+            
+            localStorage.setItem('all_data_eng',JSON.stringify(datos[0]));
+            localStorage.setItem('all_data_esp',JSON.stringify(datos[1]));
+
+            $.mobile.loading( 'hide', {
+               text: '',
+               textVisible: true,
+               theme: 'z',
+               html: ""
+           });
+
+           $('.home').show();
+        }
+    });
+
     $('span a').unbind('click').click(function(e){
+        localStorage.setItem('lang_url',$(this).attr('href'));
         $('#menu div[data-role="content"]').css('display','none');
     });
   },
@@ -60,20 +66,19 @@ var router = new $.mobile.Router({
      
      if( terms == null ){
          localStorage.setItem('validado','true');
-         if(idioma == 'eng'){
+
+         if(idioma == 'eng')
              setTimeout(function(){ $('.terms a').eq(0).click(); },1000);
-         }else if(idioma == 'esp'){
+         else if(idioma == 'esp')
             setTimeout(function(){ $('.terms a').eq(1).click(); },1000);
-         }
      }
      
      localStorage.setItem("idioma", idioma);
      
-     if(localStorage.getItem('idioma') == 'eng'){
+     if(localStorage.getItem('idioma') == 'eng')
          $('.title_app').text('Therapy tips for arthritis');
-     }else{
+     else
          $('.title_app').text('Consejos de terapias para la artritis');
-     }
      
      $('#menu div[data-role="content"]').css('display','none');
      
@@ -84,50 +89,51 @@ var router = new $.mobile.Router({
          html: ""
      });
      
-     $('.title_app').unbind('click').click(function(e) {
-         e.preventDefault();
-     });
-     
      setTimeout(function(){
-         $('.title').unbind('click').click(function(){
-             $('.content_entries').fadeOut(5);
-              var col = $(this).css('border-bottom-color');
-              localStorage.setItem('color',col);
-              var href = $(this).parent().find('.imagen').find('a').attr("href");
-              $.mobile.changePage(href,{role:"page",transition:"pop"});
-          });
-          
-           $('.imagen a').click(function(e) {
-                 e.preventDefault();
+       $('.title').unbind('click').click(function(){
+           $('.content_entries').fadeOut(50);
 
-                 var titulo = $(this).parent().parent().find('.titulo').text();                 
-                 $('.title_entrade').text(titulo);
-                 
-                 var color = $(this).parent().parent().find('.titulo').css('border-bottom-color');
-                 localStorage.setItem('color',color);
-                 var href = $(this).attr("href");
-                 var c = localStorage.getItem('color');
-                 
-                 clean_containers();
-                 
-                 $.mobile.changePage(href,{role:"page",transition:"slidefade"});
-                 
-             });
-             $('.back_languaje').unbind('click').click(function() {
-                 localStorage.removeItem('validado');
-                 $('.home').css('display','none');
-                 $.mobile.changePage( "#home", { 
-                    role: "page",
-                    transition: "flow"
-                 } );
-             });
+           var titulo = $(this).text();                 
+             $('.title_entrade').text(titulo);
+
+            var col = $(this).css('border-bottom-color');
+            localStorage.setItem('color',col);
+            var href = $(this).parent().find('.imagen').find('a').attr("href");
+            $.mobile.changePage(href,{role:"page",transition:"fade"});
+        });
+      
+        $('.imagen a').click(function(e) {
+             e.preventDefault();
+
+             var titulo = $(this).parent().parent().find('.titulo').text();                 
+             $('.title_entrade').text(titulo);
+             
+             var color = $(this).parent().parent().find('.titulo').css('border-bottom-color');
+             localStorage.setItem('color',color);
+             var href = $(this).attr("href");
+             var c = localStorage.getItem('color');
+             
+             clean_containers();
+             
+             $.mobile.changePage(href,{role:"page",transition:"fade"});
+             
+         });
+
+         $('.back_languaje').unbind('click').click(function() {
+             localStorage.removeItem('validado');
+
+             $('.home').css('display','none');
+
+             $.mobile.changePage( "#home", { 
+                role: "page",
+                transition: "fade"
+             } );
+         });
      },500);
-     
      
     if(typeof(Storage) !== "undefined") {
      
-        if(localStorage.getItem("all_data_eng")==null)
-        {
+        if(localStorage.getItem("all_data_eng")==null){
            $.ajax({
               url:webService,
               data:{
@@ -200,8 +206,7 @@ var router = new $.mobile.Router({
         });
         
         }
-        else
-        {
+        else{
             var colores = [];
             var datos = null;
             if(localStorage.getItem('idioma') == 'eng'){
@@ -275,9 +280,11 @@ var router = new $.mobile.Router({
   entrades:function(type,match,ui){
       
       var c = localStorage.getItem('color');
-      cambiar_colores(ui.toPage,c);
+
+      cambiar_colores(ui.toPage, c);
       
       $('.content_entries').empty();
+
       $.mobile.loading( 'show', {
          text: 'Cargando...',
          textVisible: true,
@@ -285,9 +292,9 @@ var router = new $.mobile.Router({
          html: ""
      }); 
      
-     
-     
       var parameters = router.getParams(match[1]);
+
+      localStorage.setItem("lang_url_entrie", window.location.hash);
       
          if(typeof(Storage) !== "undefined") {
          
@@ -391,15 +398,18 @@ var router = new $.mobile.Router({
         $('.back').unbind('click').click(function(){
             clean_containers();
             $('#menu div[data-role="content"]').css('display','none');
-            history.back();
+            window.location = localStorage.getItem('lang_url');
         });
+
+
         setTimeout(function(){
             $('.item_category .text a').click(function(e){
                 e.preventDefault();
                 var id_cat = $(this).attr('data-cat-id');
                 var href = $(this).attr("href");
                 clean_containers();
-                $.mobile.changePage(href+"&id_cat="+id_cat,{role:"page",transition:"flow"});
+
+                $.mobile.changePage(href+"&id_cat="+id_cat,{role:"page",transition:"fade"});
             });
             $('.item_category').click(function(e){
                 $(e.target).find('.text').find('a').click();
@@ -499,9 +509,12 @@ var router = new $.mobile.Router({
                   $('.flexslider').flexslider({controlNav:false});
             }
       }
+
+
       $('.back').unbind('click').click(function(){
-            clean_containers();
-            history.back();
+            //clean_containers();
+            console.log(localStorage.getItem('lang_url_entrie'));
+            $.mobile.changePage(localStorage.getItem('lang_url_entrie'),{role:"page",transition:"fade"});
         });
         
   },
@@ -516,7 +529,7 @@ var router = new $.mobile.Router({
 });
 
 $('.back').unbind('click').click(function(){
-    clean_containers()
+    clean_containers();
     history.back();
 });
 
